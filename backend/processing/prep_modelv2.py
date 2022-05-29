@@ -3,15 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import csr_matrix
-# from  processing.helper import *
-# from helper import *
 
 import os
 import random
 import requests
 from math import sqrt
-
-# random_movies_df = pd.read_csv('data_files/movies.csv', nrows=50)
 
 
 def getrandomnames(count, movies):
@@ -56,49 +52,32 @@ def collabfiltering(userinput, movies_df, ratings_df):
     userInput = userinput
     inputMovies = pd.DataFrame(userInput)
 
-    # Filtering out the movies by title
     inputId = movies_df[movies_df['title'].isin(inputMovies['title'].tolist())]
-    # Then merging it so we can get the movieId. It's implicitly merging it by title.
     inputMovies = pd.merge(inputId, inputMovies)
-    # Dropping information we won't use from the input dataframe
     inputMovies = inputMovies.drop('year', 1)
-    # Filtering out users that have watched movies that the input has watched and storing it
     userSubset = ratings_df[ratings_df['movieId'].isin(
         inputMovies['movieId'].tolist())]
     userSubsetGroup = userSubset.groupby(['userId'])
 
-    # Sorting it so users with movie most in common with the input will have priority
     userSubsetGroup = sorted(
         userSubsetGroup,  key=lambda x: len(x[1]), reverse=True)
 
-    # -----------------limit dataset
-    # userSubsetGroup = userSubsetGroup[0:1000]
-    # Store the Pearson Correlation in a dictionary, where the key is the user Id and the value is the coefficient
     pearsonCorrelationDict = {}
 
-    # For every user group in our subset
     for name, group in userSubsetGroup:
-        # Let's start by sorting the input and current user group so the values aren't mixed up later on
         group = group.sort_values(by='movieId')
         inputMovies = inputMovies.sort_values(by='movieId')
-        # Get the N for the formula
         nRatings = len(group)
-        # Get the review scores for the movies that they both have in common
         temp_df = inputMovies[inputMovies['movieId'].isin(
             group['movieId'].tolist())]
-        # And then store them in a temporary buffer variable in a list format to facilitate future calculations
         tempRatingList = temp_df['rating'].tolist()
-        # Let's also put the current user group reviews in a list format
         tempGroupList = group['rating'].tolist()
-        # Now let's calculate the pearson correlation between two users, so called, x and y
         Sxx = sum([i**2 for i in tempRatingList]) - \
             pow(sum(tempRatingList), 2)/float(nRatings)
         Syy = sum([i**2 for i in tempGroupList]) - \
             pow(sum(tempGroupList), 2)/float(nRatings)
         Sxy = sum(i*j for i, j in zip(tempRatingList, tempGroupList)) - \
             sum(tempRatingList)*sum(tempGroupList)/float(nRatings)
-
-        # If the denominator is different than zero, then divide, else, 0 correlation.
         if Sxx != 0 and Syy != 0:
             pearsonCorrelationDict[name] = Sxy/sqrt(Sxx*Syy)
         else:
@@ -137,7 +116,7 @@ def collabfiltering(userinput, movies_df, ratings_df):
     recom_df_latest_tmp['year'] = pd.to_numeric(
         recom_df_latest_tmp['year'])
     recom_df_latest = recom_df_latest_tmp.loc[recom_df_latest_tmp['year']
-                                              >= 2000]
+                                              >= 2010]
     if len(recom_df_latest.index) < 20:
         recom_df_latest = recom_df_latest_tmp.loc[recom_df_latest_tmp['year']
                                                   >= 1990]
@@ -163,3 +142,74 @@ def collabfiltering(userinput, movies_df, ratings_df):
             recomresp.append(tmpdict)
             countout += 1
     return recomresp
+
+
+# #######------------------------------------------below is not used.This uses K means clustering------------------------------
+def evaluateinput(inputuser):
+    movies = pd.read_csv('data_files/movies.csv')
+    ratings = pd.read_csv('data_files/ratings.csv')
+    for rw in inputuser:
+        ratings = ratings.append({'userId': rw['userId'], 'movieId': rw['movieId'],
+                                 'rating': rw['rating'], 'timestamp': 964982703}, ignore_index=True)
+    print(ratings)
+    # Merge the two tables then pivot so we have Users X Movies dataframe
+    ratings_title = pd.merge(
+        ratings, movies[['movieId', 'title']], on='movieId')
+    user_movie_ratings = pd.pivot_table(
+        ratings_title, index='userId', columns='title', values='rating')
+
+    user_movie_ratings = pd.pivot_table(
+        ratings_title, index='userId', columns='title', values='rating')
+    most_rated_movies_1k = user_movie_ratings
+
+    # Remove all nulls
+    tmpmovies = most_rated_movies_1k.copy()
+    tmpmovies = tmpmovies.fillna(0)
+    dtcols = most_rated_movies_1k.columns
+    tmpdict = {}
+    for v in dtcols:
+        tmpdict[v] = pd.arrays.SparseArray(tmpmovies[v])
+
+    sparseFrame = pd.DataFrame(tmpdict)
+    sparse_ratings = csr_matrix(sparseFrame)
+
+    # 20 clusters
+    predictions = KMeans(
+        n_clusters=20, algorithm='full').fit_predict(sparse_ratings)
+
+    clustered = pd.concat([most_rated_movies_1k.reset_index(
+    ), pd.DataFrame({'group': predictions})], axis=1)
+
+    cluster_number = clustered[clustered['userId']
+                               == inputuser[0]['userId']]['group'].values[0]
+
+    cluster = clustered[clustered.group ==
+                        cluster_number].drop(['group'], axis=1)
+    user_id = cluster[cluster['userId'] == inputuser[0]['userId']].index[0]
+
+    # Get all this user's ratings
+    user_2_ratings = cluster.loc[user_id, :]
+    user_2_unrated_movies = user_2_ratings[user_2_ratings.isnull()]
+
+    # What are the ratings of these movies the user did not rate?
+    avg_ratings = pd.concat(
+        [user_2_unrated_movies, cluster.mean()], axis=1, join='inner').loc[:, 0]
+
+    # Let's sort by rating so the highest rated movies are presented first
+    avg_ratings.sort_values(ascending=False)[:20]
+
+    otput_names = avg_ratings.sort_values(ascending=False)[:5].index
+
+    outputlist = []
+    for nme in otput_names:
+        tmpdict = {}
+        tmpnme = nme[:-7]
+        tmpdict['title'] = tmpnme
+        # get movie image
+        apiurl = 'http://www.omdbapi.com/?t='+tmpnme+'&apikey=3fe481cf'
+        resp = requests.get(apiurl)
+        if resp.json()['Response'] == 'False':
+            continue
+        tmpdict['imageurl'] = resp.json()['Poster']
+        outputlist.append(tmpdict)
+    return outputlist
