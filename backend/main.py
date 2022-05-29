@@ -4,7 +4,7 @@ from os import path
 from zipfile import ZipFile
 import requests
 from flask import jsonify, request, make_response
-from processing.prep_modelv2 import getrandomnames, collabfiltering
+from processing.processor import getrandomnames, collabfiltering
 from flask_cors import CORS
 import pandas as pd
 
