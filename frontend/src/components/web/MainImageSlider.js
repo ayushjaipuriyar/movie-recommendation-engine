@@ -40,7 +40,7 @@ export default function TextMobileStepper(props) {
 	useEffect(() => {
 		const getMovies = async () => {
 			try {
-				const apiurl = 'http://127.0.0.1:5000/getrandom?count=10';
+				const apiurl = 'http://127.0.0.1:5000/getrandom?count=4';
 				const apiresp = await fetch(apiurl);
 				const apidata = await apiresp.json();
 				let tmpdata = [];
