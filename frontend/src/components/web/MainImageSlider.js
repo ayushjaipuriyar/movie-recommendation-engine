@@ -12,8 +12,8 @@ export default function TextMobileStepper(props) {
 	const [activeStep, setActiveStep] = React.useState(0);
 	const [ratingValue, setRating] = useState([]);
 	const [movieArr, setMovarr] = useState([]);
-	const [resultsArray, setResults] = useState([]);
-	const [showLoading, setLoading] = useState(false);
+	// const [resultsArray, setResults] = useState([]);
+	// const [showLoading, setLoading] = useState(false);
 	function setRatingarr(inptval) {
 		if (movieArr.includes(inptval.movieId)) {
 			setRating((oldval) => [
@@ -50,7 +50,6 @@ export default function TextMobileStepper(props) {
 					tmpdict.imgPath = rw.imageurl;
 					tmpdict.movieId = rw.movieId;
 					tmpdata.push(tmpdict);
-					// setImages((oldval)=>[...oldval,tmpdict])
 					setMaxsteps((old) => old + 1);
 				});
 				setMaxsteps((old) => old - 1);
@@ -75,7 +74,6 @@ export default function TextMobileStepper(props) {
 	}
 
 	const handleNext = () => {
-		// console.log(ratingValue);
 		if (!movieArr.includes(tutorialSteps[activeStep].movieId)) {
 			alert('Please select a rating!!');
 			return;
@@ -112,8 +110,17 @@ export default function TextMobileStepper(props) {
 							disabled={activeStep === maxSteps - 1}
 						>
 							Next
-							<KeyboardArrowLeft />
 							<KeyboardArrowRight />
+						</Button>
+					}
+					backButton={
+						<Button
+							size='small'
+							onClick={handleBack}
+							disabled={activeStep === maxSteps - 1}
+						>
+							<KeyboardArrowLeft />
+							Prev
 						</Button>
 					}
 				/>

@@ -1,28 +1,46 @@
-from flask import Flask, render_template, request
+from flask import Flask, request
 import os
-import random
-from flask import json, url_for, jsonify, request, make_response
-from data_processing.prep_modelv2 import getrandomnames, collabfiltering
+from os import path
+from zipfile import ZipFile
+import requests
+from flask import jsonify, request, make_response
+from processing.prep_modelv2 import getrandomnames, collabfiltering
 from flask_cors import CORS
 import pandas as pd
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
-movies_df = pd.read_csv('data_files/movies.csv', nrows=190000)
-random_movies_df = pd.read_csv('data_files/movies.csv')
-ratings_df = pd.read_csv('data_files/ratings.csv')
-movies_df['year'] = movies_df.title.str.extract('(\(\d\d\d\d\))', expand=False)
-movies_df['year'] = movies_df.year.str.extract('(\d\d\d\d)', expand=False)
-# Removing the years from the 'title' column
-movies_df['title'] = movies_df.title.str.replace('(\(\d\d\d\d\))', '')
-# Applying the strip function to get rid of any ending whitespace characters that may have appeared
-movies_df['title'] = movies_df['title'].apply(lambda x: x.strip())
-# Dropping the genres column
-# movies_df = movies_df.drop('genres', 1)
-# Drop removes a specified row or column from a dataframe
-# ratings_df = ratings_df.drop('timestamp', 1)
+file = True
+file_url = 'https://files.grouplens.org/datasets/movielens/ml-25m.zip'
 
+while(file):
+    if((path.exists('./data_files/ml-25m/movies.csv')) and (path.exists('./data_files/ml-25m/ratings.csv'))):
+        print('Files found')
+        file=False
+    else:
+        if(path.exists('./data_files/archive.zip')):
+            print('Archive Found')
+            with ZipFile('./data_files/archive.zip', 'r') as zipObj:
+                zipObj.extractall('./data_files/')
+                print('File has been unzipped')
+            file=False
+        else:
+            file_obj = requests.get(file_url)
+            with open('./data_files/archive.zip', 'wb') as local_file:
+                local_file.write(file_obj.content)
+            with ZipFile('./data_files/archive.zip', 'r') as zipObj:
+                zipObj.extractall('./data_files/')
+                print('File has been unzipped')
+            file=False
+
+movies = pd.read_csv('./data_files/ml-25m/movies.csv')
+random_movies = pd.read_csv('./data_files/ml-25m/movies.csv')
+ratings_df = pd.read_csv('./data_files/ml-25m/ratings.csv')
+movies['year'] = movies.title.str.extract('(\(\d\d\d\d\))', expand=False)
+movies['year'] = movies.year.str.extract('(\d\d\d\d)', expand=False)
+movies['title'] = movies.title.str.replace('(\(\d\d\d\d\))', '')
+movies['title'] = movies['title'].apply(lambda x: x.strip())
 
 @app.route('/')
 def index():
@@ -34,25 +52,24 @@ def getrandommovies():
     try:
         args = request.args
         nummoviees = int(args['count'])
-        ids = getrandomnames(nummoviees, random_movies_df)
-        response= make_response(jsonify(ids=ids))
+        ids = getrandomnames(nummoviees, random_movies)
+        resp = make_response(jsonify(ids=ids))
     except Exception as e:
-        response= make_response(
+        resp = make_response(
             jsonify(error='an error occured in getting response'), 500)
-    return response
+    return resp
 
 
 @app.route('/getrecomcollab', methods=['POST'])
 def getrecomcollab():
     usrinput = request.get_json()
     try:
-        recomresponse= collabfiltering(usrinput, movies_df, ratings_df)
-        response = make_response(jsonify(recomresponse))
+        recomresp = collabfiltering(usrinput, movies, ratings_df)
+        resp = make_response(jsonify(recomresp))
     except Exception as e:
-        response= make_response(
+        resp = make_response(
             jsonify(error='an error occured in getting response'), 500)
-    return response
-
+    return resp
 
 if __name__ == '__main__':
     appPort = int(os.environ.get('PORT', 5000))

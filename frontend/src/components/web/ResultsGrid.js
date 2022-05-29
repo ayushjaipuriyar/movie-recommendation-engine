@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
-// import { makeStyles } from '@mui/styles';
-// import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import CardCntnt from '../web/ResultsGridCard';
-
-// const useStyles = makeStyles((theme) => ({
-// 	paper: {
-// 		padding: theme.spacing(1),
-// 		textAlign: 'center',
-// 		color: theme.palette.text.secondary,
-// 		backgroundColor: 'transparent',
-// 		border: 'none',
-// 		borderColor: 'transparent',
-// 		paddingLeft: '10%',
-// 	},
-// }));
-
 export default function NestedGrid(props) {
-	// const classes = useStyles();
-	// const data=[1,2,3,4]
 	const [data, setData] = useState(props.resultsData);
 
 	function FormRow() {

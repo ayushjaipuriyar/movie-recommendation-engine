@@ -3,6 +3,7 @@
 	margin: 0;
 	padding: 0;
 	font-family: 'Space Grotesk', sans-serif, serif !important;
+	text-align: center;
 }
 
 html,
@@ -14,26 +15,19 @@ body {
 	/* overflow: hidden; */
 	/* padding-bottom: 20px; */
 	padding: 0px;
-	overflow-x: hidden;
-	overflow-y: hidden;
+	/* overflow-y: hidden; */
 }
 
-div#root,
-div.mainContainer {
-	position: relative;
+div#root {
+	width: 100%;
 	height: 100%;
-	overflow: hidden;
-	background-color: rgba(0, 0, 0, 0.1);
 }
-
-div.slidercontainer {
-	position: relative;
-	left: 36%;
-	top: 10%;
-	/* box-shadow:0px 0px 30px 1px #333333;  
-  border-radius: 5rem;
-  width: 400px; */
-	/* text-decoration: ; */
+div.mainContainer {
+	/* position: relative; */
+	width: 100%;
+	min-height: 102vh;
+	max-height: 100%;
+	background-color: rgba(0, 0, 0, 0.1);
 }
 
 button.ratingsavebtn {
@@ -46,7 +40,7 @@ div.resultscontainer {
 	/* left:500px; */
 	top: 5%;
 	/* background-color: cadetblue; */
-	height: 70%;
+	/* height: 70%; */
 	/* padding: 500px; */
 }
 
@@ -55,58 +49,23 @@ div.resultsimages {
 	width: 100px;
 	height: 20px;
 }
-
+/* 
 h2.webmainlabel {
 	position: relative;
 	color: #214252;
 	font-family: 'Caveat', cursive;
 	/* margin: auto; */
-	left: 29%;
-}
+/* left: 29%; */
 
+/* 
 /*  ############################################################################################################################### */
 /*  #################################################style for mobile########################################################### */
-@media screen and (max-width: 800px) {
+/* @media screen and (max-width: 800px) {
 	div.mainContainer {
 		display: none;
 	}
+} */
 
-	h2.mobmainlabel {
-		position: relative;
-		color: #214252;
-		font-family: 'Caveat', cursive;
-		/* margin: auto; */
-		/* left:5%; */
-		/* top:5%; */
-		left: 10%;
-	}
-
-	div.mobslidercontainer {
-		position: relative;
-		/* margin: auto; */
-		left: 2%;
-		top: 2%;
-		/* box-shadow:0px 0px 30px 1px #333333;  
-    border-radius: 5rem;
-    width: 400px; */
-		/* text-decoration: ; */
-	}
-
-	button.mobratingsavebtn {
-		position: relative;
-		left: 500px;
-		/* background-color: aliceblue; */
-	}
-
-	div.mobresultscontainer {
-		position: relative;
-		/* left:500px; */
-		top: 2%;
-		/* background-color: cadetblue; */
-		height: 70%;
-		/* padding: 500px; */
-	}
-}
 /*  ############################################################################################################################### */
 /*  #################################################style for mobile########################################################### */
 
@@ -116,7 +75,7 @@ h2.webmainlabel {
 }
 
 .root {
-	max-width: 400px;
+	/* max-width: 400px; */
 	flex-grow: 1;
 	/* position:"relative",
  left:'130px' */
@@ -153,16 +112,17 @@ h2.webmainlabel {
 	width: 100%;
 }
 .mainRoot {
-	max-width: 400px;
+	/* max-width: 400px; */
+	align-items: center;
+	align-content: center;
 	flex-grow: 1;
 	box-shadow: 0px 0px 30px 1px #333333;
 	height: 100%;
 	text-align: center;
-	
 }
 .mainImg {
-	height: 500px;
-	width: 400px;
+	max-height: 276px;
+	max-width: 276px;
 	overflow: hidden;
 	display: block;
 	width: 100%;

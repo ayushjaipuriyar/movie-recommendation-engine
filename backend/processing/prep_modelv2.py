@@ -1,12 +1,9 @@
 import pandas as pd
-# from data_processing.helper import *
+from processing.helper import *
 
-import os
 import random
 import requests
 from math import sqrt
-
-random_movies_df = pd.read_csv('data_files/movies.csv', nrows=50)
 
 
 def getrandomnames(count, movies):
@@ -15,15 +12,12 @@ def getrandomnames(count, movies):
     for v in range(count):
         val = random.randint(1, 51800)
         tmpyr = movies.loc[val]['title'][-5:-1]
-        # print(int(tmpyr)<2000)
         while (val in randomids) or (int(tmpyr) < 2000):
-            # print(tmpyr)
-            val = random.randint(1, 5000)
+            val = random.randint(1, 51800)
             tmpyr = movies.loc[val]['title'][-5:-1]
         randomids.append(val)
     for val in randomids:
         tmpval = movies.loc[val]
-        # print(tmpval)
         tmpdict = {}
         tmpdict['movieId'] = str(tmpval['movieId'])
         print(tmpval['title'])
@@ -31,14 +25,13 @@ def getrandomnames(count, movies):
         print(tmptitle)
         tmpdict['title'] = tmptitle
         tmpdict['actual'] = tmpval['title']
-        # get movie image
         apiurl = 'http://www.omdbapi.com/?t='+tmptitle+'&apikey=3fe481cf'
         resp = requests.get(apiurl)
         if resp.json()['Response'] == 'False' or resp.json()['Poster'] == 'N/A':
-            val1 = random.randint(1, 5000)
+            val1 = random.randint(1, 51800)
             tmpyr1 = movies.loc[val]['title'][-5:-1]
             while (val1 in randomids) or (int(tmpyr1) < 2000):
-                val1 = random.randint(1, 5000)
+                val1 = random.randint(1, 51800)
                 tmpyr1 = movies.loc[val1]['title'][-5:-1]
             randomids.append(val1)
             continue
@@ -122,7 +115,7 @@ def collabfiltering(userinput, movies_df, ratings_df):
         recom_df_latest.head(20)['movieId'].tolist())]
     recomresp = []
     countout = 0
-    for idx, rw in recom_df.iterrows():
+    for rw in recom_df.iterrows():
         if countout < 4:
             tmpdict = {}
             tmpdict['movieId'] = rw['movieId']
