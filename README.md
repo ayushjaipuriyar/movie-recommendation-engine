@@ -60,7 +60,8 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+![Product Name Screen Shot][product-recommendation]
+![Product Name Screen Shot][product-rating]
 
 Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `ayushjaipuriyar`, `movie-recommendation-engine`, `twitter_handle`, `ayushjaipuriyar`, `gmail`, `ayushjaipuriyar21`, `project_title`, `project_description`
 
@@ -160,7 +161,8 @@ Project Link: [https://github.com/ayushjaipuriyar/movie-recommendation-engine](h
 [license-url]: https://github.com/ayushjaipuriyar/movie-recommendation-engine/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/ayushjaipuriyar
-[product-screenshot]: images/screenshot.png
+[product-rating]: images/1659528983.png
+[product-recommendation]: images/1659528993.png
 [react.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [react-url]: https://reactjs.org/
 [python.org]: https://img.shields.io/badge/Python-366B98?style=for-the-badge&logo=python&logoColor=F2C53D
